@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "432055632242",
+    "project_id": "aissnapshot",
+    "storage_bucket": "aissnapshot.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:432055632242:android:3413668af7b2672f681deb",
+        "android_client_info": {
+          "package_name": "com.magsnapshot.api"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "432055632242-5m0qiq52a0lm2mun5844cqe89j9t1bio.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy9WFGclWk51jy9t__xk3g309n5rjKt6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "432055632242-5m0qiq52a0lm2mun5844cqe89j9t1bio.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

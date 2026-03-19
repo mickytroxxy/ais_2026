@@ -1,0 +1,75 @@
+{
+  "expo": {
+    "name": "AIS SNAPSHOT",
+    "slug": "aissnapshot",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.aissnapshotapp.api",
+      "supportsTablet": true,
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow AIS SNAPSHOT to take photos for uploads",
+        "NSLocationWhenInUseUsageDescription": "Allow AIS SNAPSHOT to take photos for uploads",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow AIS SNAPSHOT to take photos for uploads",
+        "NSLocationAlwaysUsageDescription": "Allow AIS SNAPSHOT to take photos for uploads"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDy9WFGclWk51jy9t__xk3g309n5rjKt6c"
+        },
+        "googleMobileAdsAppId": "ca-app-pub-7273251331335061~4202453362"
+      },
+      "package": "com.magsnapshot.api",
+      "permissions": [
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "RECORD_VIDEO",
+        "RECORD_AUDIO",
+        "LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "NOTIFICATIONS"
+      ],
+      "versionCode": 2006
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7e2c953d-1b54-4a97-9824-7daca09a02c6"
+      }
+    }
+  },
+  "plugins": [
+    [
+      "expo-image-picker",
+      {
+        "photosPermission": "The app accesses your photos to let you share them with your friends."
+      }
+    ]
+  ]
+}

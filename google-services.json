@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "362193500225",
+    "project_id": "aissnapshot-6d8a8",
+    "storage_bucket": "aissnapshot-6d8a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:362193500225:android:99192f0fa26304ace5aec0",
+        "android_client_info": {
+          "package_name": "com.empiredigitalsmain.snapshot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7Mw1pDc-KdrJExXiOWdyH8orPV5_k_zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
