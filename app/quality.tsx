@@ -4,10 +4,12 @@ import { getNetworkStatus } from "@/contexts/Api";
 import { useAppContext } from "@/contexts/AppContext";
 import { FontAwesome } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function QualityControlScreen({ route, navigation }: any) {
+  const router = useRouter();
   const {
     fontFamilyObj,
     showToast,
@@ -212,13 +214,16 @@ export default function QualityControlScreen({ route, navigation }: any) {
               : item,
           ),
         );
-        navigation.navigate("CameraScreen", {
-          options: {
-            category: "QUALITY CONTROL",
-            subCategory: currentElement.element,
+        router.push({
+          pathname: "/camera",
+          params: {
+            options: JSON.stringify({
+              category: "QUALITY PHOTOS",
+              subCategory: currentElement.element,
+            }),
+            counter: "0",
+            comment,
           },
-          counter: 0,
-          comment,
         });
       }
     }
@@ -240,7 +245,7 @@ export default function QualityControlScreen({ route, navigation }: any) {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={colors.securityGradient as any}
+        colors={["#fff", "#f2f2f2"]}
         style={{
           flex: 1,
           paddingTop: 10,

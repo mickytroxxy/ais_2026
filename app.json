@@ -2,7 +2,7 @@
   "expo": {
     "name": "AIS SNAPSHOT",
     "slug": "snapshot",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
     "scheme": "snapshot",
@@ -10,12 +10,19 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.empiredigitalsmain.snapshot",
+      "bundleIdentifier": "com.aissnapshotapp.api",
+      "buildNumber": "2",
+      "entitlements": {
+        "com.apple.security.application-groups": [
+          "group.com.aissnapshotapp.api.onesignal"
+        ]
+      },
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         },
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": ["remote-notification", "remote-notification"],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -29,8 +36,16 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.empiredigitalsmain.snapshot",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 10001,
-      "permissions": ["RECEIVE_BOOT_COMPLETED", "VIBRATE", "POST_NOTIFICATIONS"]
+      "versionCode": 10003,
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "POST_NOTIFICATIONS",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "output": "static",

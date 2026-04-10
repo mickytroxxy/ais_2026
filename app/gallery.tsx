@@ -16,12 +16,15 @@ import {
 } from "react-native";
 
 // Interface for photo metadata
-interface PhotoWithMetadata {
+export interface PhotoWithMetadata {
   url: string;
   fallbackUrl?: string;
   date?: string;
+  time?: string;
+  picture_comment?: string;
   user?: string;
   picture_name?: string;
+  stage?: string;
 }
 
 let photoExistObj: any[] = [];
@@ -61,7 +64,6 @@ export default function GalleryScreen() {
       options.category === "BOOKING PHOTOS"
     ) {
       getBookingPhotos(carObj.Key_Ref, (result: any[], uri: string) => {
-        console.log("[Gallery] Booking photo data received:", result);
         photoExistObj = result || [];
 
         if (!result || result.length === 0) {
@@ -69,7 +71,7 @@ export default function GalleryScreen() {
           setIsLoading(false);
           return;
         }
-
+        console.log("[Gallery] Processing photos with:", result?.[0]);
         const processedPhotos: PhotoWithMetadata[] = result.map((item: any) => {
           const primaryUrl = `${baseImg}/mag_qoutation/mag_snapshot/security_images/${carObj.Key_Ref}/${item.url}`;
           const fallbackUrl = `${fallbackBaseImg}/mag_qoutation/mag_snapshot/security_images/${carObj.Key_Ref}/${item.url}`;
@@ -77,7 +79,11 @@ export default function GalleryScreen() {
             url: primaryUrl,
             fallbackUrl,
             date: item.date,
+            time: item.time,
             user: item.user || item.uploaded_by || item.staff_name,
+            picture_name: item.url,
+            picture_comment: item.picture_comment,
+            stage: item.stage,
           };
         });
 
@@ -89,7 +95,7 @@ export default function GalleryScreen() {
         options.category,
         carObj.Key_Ref,
         (result: any[], uri: string) => {
-          console.log("[Gallery] Photo data received:", result);
+          console.log("[Gallery] Processing photos with:", result?.[0]);
           photoExistObj = result || [];
 
           if (!result || result.length === 0) {
@@ -108,6 +114,9 @@ export default function GalleryScreen() {
                 date: item.date,
                 user: item.user || item.uploaded_by || item.staff_name,
                 picture_name: item.picture_name,
+                picture_comment: item.picture_comment,
+                stage: item.stage,
+                time: item.time,
               };
             },
           );
@@ -121,10 +130,16 @@ export default function GalleryScreen() {
 
   const goToCamera = () => {
     if (options.category === "WORK IN PROGRESS") {
-      setModalState({
-        isVisible: true,
-        attr: { headerText: "ADD NOTES", onModalClose },
-      });
+      // setModalState({
+      //   isVisible: true,
+      //   attr: { headerText: "ADD NOTES", onModalClose },
+      // });
+      console.log(
+        `Vehicle ${carObj?.Reg_No} is on stage: ${options.subCategory}`,
+      );
+      visitCamera(
+        `Vehicle ${carObj?.Reg_No} is on stage: ${options.subCategory}`,
+      );
     } else {
       visitCamera("");
     }
@@ -206,7 +221,7 @@ export default function GalleryScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={colors.securityGradient as any}
+        colors={[colors.white, colors.white]}
         style={styles.content}
       >
         <ScrollView style={styles.scrollView}>

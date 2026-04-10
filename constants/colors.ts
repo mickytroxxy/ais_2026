@@ -18,18 +18,18 @@ export const border = "#ccc";
 export const bubbleRight = "#7ab6e6";
 export const bubbleLeftAI = "#e8f5e9";
 export const bubbleLeftUser = "#d7e5e5";
-export const aiText = "#2e7d32";
+export const aiText = "#000000ff";
 
 // Gradient individual colors
-export const loginGradientStart = "#BED0D8";
+export const loginGradientStart = "#000000ff";
 export const loginGradientMid = header;
 export const loginGradientMid2 = primary;
-export const loginGradientEnd = "#EFEFEF";
+export const loginGradientEnd = "#000000ff";
 
-export const securityGradientStart = "#fff";
-export const securityGradientMid1 = "#fff";
-export const securityGradientMid2 = "#fff";
-export const securityGradientEnd = "#f1f7fa";
+export const securityGradientStart = "#000000ff";
+export const securityGradientMid1 = "#000000ff";
+export const securityGradientMid2 = "#000000ff";
+export const securityGradientEnd = "#000000ff";
 
 export const groupChatGradientStart = "#727272";
 export const groupChatGradientMid = "#edfff3";
@@ -42,6 +42,7 @@ export const darkText = "#333";
 export const lightGreyBorder = "#eee";
 export const selectedOptionBg = "#f0f7ff";
 export const headerLight = "#BED0D8";
+export const textPrimary = "#000000";
 
 // Linear gradients using individual color constants
 export const loginGradient = [
@@ -99,6 +100,7 @@ export const colors = {
   lightGreyBorder,
   selectedOptionBg,
   headerLight,
+  textPrimary,
 
   // Individual gradient colors for reference
   loginGradientStart,

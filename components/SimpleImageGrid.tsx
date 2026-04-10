@@ -1,26 +1,12 @@
+import { PhotoWithMetadata } from "@/app/gallery";
 import { colors } from "@/constants/colors";
 import { useAppContext } from "@/contexts/AppContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import {
-  Dimensions,
-  Image,
-  Modal,
-  Share,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, Modal, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
 
 // Interface for photo metadata
-interface PhotoWithMetadata {
-  url: string;
-  fallbackUrl?: string;
-  date?: string;
-  user?: string;
-  picture_name?: string;
-}
 
 interface SimpleImageGridProps {
   data: PhotoWithMetadata[];
@@ -48,12 +34,15 @@ function GridImage({
         styles.imageWrapper,
         { width: imageSize, height: imageSize + 50 },
       ]}
-      onPress={onPress}
+      onPress={() => {
+        onPress();
+        console.log("Image pressed:", item.url);
+      }}
     >
       <Image
         source={{ uri }}
         style={[styles.image, { width: imageSize - 4, height: imageSize - 4 }]}
-        resizeMode="cover"
+        contentFit="cover"
         onError={() => {
           if (item.fallbackUrl && uri !== item.fallbackUrl) {
             setUri(item.fallbackUrl);
@@ -63,7 +52,7 @@ function GridImage({
       <View style={styles.metadataContainer}>
         {item.date && (
           <Text style={styles.metadataText} numberOfLines={1}>
-            {item.date}
+            {item.date} {item?.time ? `- ${item?.time}` : "NO TIME"}
           </Text>
         )}
         {item.user && (
@@ -82,6 +71,9 @@ export default function SimpleImageGrid({
 }: SimpleImageGridProps) {
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
   const { fontFamilyObj } = useAppContext();
+
+  // Find the selected photo item from the data array
+  const selectedPhoto = data.find((item) => item.url === selectedImage);
   const numColumns = 3;
   const screenWidth = Dimensions.get("window").width;
   const imageSize = (screenWidth - 40) / numColumns;
@@ -134,7 +126,7 @@ export default function SimpleImageGrid({
             imageSize={imageSize}
             onPress={() => {
               setSelectedImage(item.url);
-              console.log("Selected image URL:", item.url);
+              console.log("Selected image URL:", item);
             }}
           />
         ))}
@@ -155,8 +147,38 @@ export default function SimpleImageGrid({
               <Image
                 source={{ uri: selectedImage }}
                 style={styles.fullImage}
-                resizeMode="contain"
+                contentFit="contain"
               />
+              {(selectedPhoto?.picture_comment || selectedPhoto?.stage) && (
+                <View style={styles.metadataModalContainer}>
+                  {selectedPhoto?.picture_comment && (
+                    <Text
+                      style={[
+                        {
+                          fontFamily: fontFamilyObj?.fontLight,
+                          color: colors.white,
+                        },
+                        { textAlign: "center", marginTop: 10 },
+                      ]}
+                    >
+                      {selectedPhoto.picture_comment}
+                    </Text>
+                  )}
+                  {selectedPhoto?.stage && (
+                    <Text
+                      style={[
+                        {
+                          color: colors.white,
+                          fontFamily: fontFamilyObj?.fontBold,
+                        },
+                        { textAlign: "center", marginTop: 5 },
+                      ]}
+                    >
+                      Stage: {selectedPhoto.stage}
+                    </Text>
+                  )}
+                </View>
+              )}
               {category === "ADDITIONAL" && (
                 <TouchableOpacity
                   style={styles.shareButton}
@@ -207,6 +229,20 @@ const styles = StyleSheet.create({
   metadataUserText: {
     color: colors.border,
     fontSize: 9,
+  },
+  metadataModalContainer: {
+    position: "absolute",
+    left: 10,
+    right: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    padding: 10,
+    borderRadius: 8,
+    marginHorizontal: "5%",
+    bottom: 100,
+  },
+  stageText: {
+    color: colors.primary,
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,

@@ -319,7 +319,7 @@ export const uploadFile = async (
     Math.floor(Math.random() * 899999 + 100000) +
     extension;
 
-  if (category == "BOOKING PHOTOS") {
+  if (category == "SECURITY PHOTOS") {
     filePath =
       "../mag_qoutation/mag_snapshot/security_images/" +
       activeKeyRef +
@@ -328,6 +328,7 @@ export const uploadFile = async (
       Math.floor(Math.random() * 899999 + 100000) +
       extension;
   }
+
   console.log("Constructed filePath:", filePath);
   const formData = new FormData();
   formData.append("fileUrl", { uri, name, type: mimeType } as any);
@@ -565,7 +566,7 @@ export const sendNotificationToAllDevices = async (
         await fetch("https://exp.host/--/api/v2/push/send", {
           method: "POST",
           headers: {
-            Accept: "application/json",
+            "Accept": "application/json",
             "Accept-encoding": "gzip, deflate",
             "Content-Type": "application/json",
           },
@@ -584,5 +585,37 @@ export const sendNotificationToAllDevices = async (
     );
   } catch (error) {
     console.error("[Notifications] Error sending to all devices:", error);
+  }
+};
+
+export const getComments = async (
+  Key_Ref: string,
+  cb: (result: any[]) => void,
+) => {
+  try {
+    getNetworkStatus((socket) => {
+      socket.emit("getComments", Key_Ref, (result: any[]) => {
+        cb(result);
+      });
+    });
+  } catch (e) {
+    cb([]);
+  }
+};
+
+export const saveNotes = async (
+  notes: string,
+  Key_Ref: string,
+  userId: string,
+  cb: (result: boolean) => void,
+) => {
+  try {
+    getNetworkStatus((socket) => {
+      socket.emit("saveNotes", notes, Key_Ref, userId, (result: boolean) => {
+        cb(result);
+      });
+    });
+  } catch (e) {
+    cb(false);
   }
 };

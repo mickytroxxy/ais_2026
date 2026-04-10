@@ -236,15 +236,15 @@ const BodySection = ({ selectedCategory }: { selectedCategory: string }) => {
       });
       return;
     } else if (category == "Add Notes") {
-      setModalState({
-        isVisible: true,
-        attr: { headerText: "ADD NOTES", onModalClose },
+      router.push({
+        pathname: "/notes",
+        params: { activeKeyRef: carObj.Key_Ref },
       });
       return;
     } else if (category == "Notes") {
-      setModalState({
-        isVisible: true,
-        attr: { headerText: "ADD NOTES", onModalClose },
+      router.push({
+        pathname: "/notes",
+        params: { activeKeyRef: carObj.Key_Ref },
       });
       return;
     } else if (category == "Security Checklist") {
@@ -301,6 +301,9 @@ const BodySection = ({ selectedCategory }: { selectedCategory: string }) => {
     } else if (category == "Insurance Details") {
       router.push("/insurance-details");
       return;
+    } else if (category == "New Client") {
+      router.push("/additem");
+      return;
     } else {
       options = {
         category: category.toUpperCase(),
@@ -324,17 +327,25 @@ const BodySection = ({ selectedCategory }: { selectedCategory: string }) => {
           category: "WORK IN PROGRESS",
           subCategory: response.value,
         });
-      } else if (response.action == "comment") {
+      } else if (response.action == "comment" || response.action == "sms") {
+        console.log("Modal response:", response.sendSms, response.value);
+
         const notes = response.value;
         if (notes.length > 0) {
           getNetworkStatus((socket, url) => {
-            socket.emit("saveNotes", notes, activeKeyRef, userId, (cb: any) => {
-              if (cb) {
-                showToast("Notes saved successfully!");
-              } else {
-                showToast("There was an error while trying to save notes!");
-              }
-            });
+            socket.emit(
+              !response.sendSms ? "saveChat" : "saveNotes",
+              notes,
+              activeKeyRef,
+              userId,
+              (cb: any) => {
+                if (cb) {
+                  showToast("Notes saved successfully!");
+                } else {
+                  showToast("There was an error while trying to save notes!");
+                }
+              },
+            );
           });
         } else {
           showToast("Please add something to proceed!");

@@ -240,7 +240,7 @@ export default function AddItemScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={colors.securityGradient as any}
+        colors={[colors.white, colors.white]}
         style={styles.gradient}
       >
         <ScrollView style={{ padding: 10 }}>

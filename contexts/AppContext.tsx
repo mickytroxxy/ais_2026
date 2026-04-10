@@ -242,6 +242,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     "Console",
     "Headlining",
     "Radio",
+    "Towing Invoice",
     "Parcel 1",
     "Parcel 2",
     "Parcel 3",

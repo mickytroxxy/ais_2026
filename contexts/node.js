@@ -507,6 +507,20 @@ io.sockets.on("connection", function (socket) {
       );
     },
   );
+  socket.on("get_docs_desc", function (cb) {
+    connection.query(
+      "SELECT * FROM docs_description",
+      [],
+      function (error, result) {
+        if (!error) {
+          console.log("The docs description is ", result);
+          cb(result);
+        } else {
+          console.log(error);
+        }
+      },
+    );
+  });
   socket.on("getDocuments", function (Key_Ref, cb) {
     connection.query(
       "SELECT * FROM document WHERE Key_Ref=?",
@@ -522,22 +536,11 @@ io.sockets.on("connection", function (socket) {
       },
     );
   });
-  socket.on("updateClientDoc", (filePath, Key_Ref, cb) => {
-    if (!filePath || typeof filePath !== "string") {
-      cb(false);
-      return;
-    }
-    let normalizedPath = filePath.replace(/\\/g, "/");
-    normalizedPath = normalizedPath.replace(/^\.\./, "");
-    normalizedPath = normalizedPath.replace(/^\//, "");
-    normalizedPath = normalizedPath.replace(/\/\/+/, "/");
-    if (normalizedPath.startsWith("ais/public/docs")) {
-      normalizedPath = "/" + normalizedPath;
-    }
+  socket.on("updateClientDoc", (filePath, description, Key_Ref, cb) => {
+    filePath = filePath.split("/").pop();
     var date = dateTimeFn(true);
     var time = dateTimeFn(false);
-    console.log("The document path is ", normalizedPath);
-    var description = "Release Invoice";
+    console.log("The document path is ", filePath);
     connection.query(
       "INSERT INTO document SET ?",
       {
@@ -545,7 +548,7 @@ io.sockets.on("connection", function (socket) {
         Key_Ref: Key_Ref,
         date: date,
         time: time,
-        url: normalizedPath,
+        url: filePath,
         user: "Developer - Micky",
       },
       function (err, results, fields) {
@@ -553,22 +556,6 @@ io.sockets.on("connection", function (socket) {
           cb(true);
         } else {
           cb(false);
-        }
-      },
-    );
-  });
-  socket.on("login", function (branch, password, cb) {
-    var userId = Math.floor(Math.random() * 899999 + 100099);
-    connection1.query(
-      "SELECT * FROM user WHERE use_password=? AND comp_code=?",
-      [md5(password), branch],
-      function (error, result) {
-        if (!error) {
-          if (result.length > 0) {
-            cb(result[0].use_key);
-          } else {
-            cb(false);
-          }
         }
       },
     );
@@ -1318,7 +1305,7 @@ io.sockets.on("connection", function (socket) {
   );
   socket.on("getComments", (Key_Ref, cb) => {
     connection.query(
-      "SELECT * FROM notes WHERE Key_Ref=?",
+      "SELECT * FROM notes WHERE Key_Ref=? ORDER BY id DESC",
       [Key_Ref],
       function (error, result) {
         if (!error) {
@@ -1331,7 +1318,7 @@ io.sockets.on("connection", function (socket) {
     "updateInsuranceDetails",
     function (Key_Ref, insuranceType, insuranceKey, cb) {
       connection.query(
-        "UPDATE client_details SET insurance_type=?, insuranceKey=? WHERE Key_Ref=?",
+        "UPDATE client_details SET insurace_type=?, insuranceKey=? WHERE Key_Ref=?",
         [insuranceType, insuranceKey, Key_Ref],
         function (error, result) {
           if (!error) {
@@ -1354,7 +1341,7 @@ http.listen(3000, () => {
     } else {
       conn.release();
       console.log("database Access granted");
-      deleteFiles("MS1031643");
+      //deleteFiles("MS1031643");
     }
   });
 });
@@ -1632,9 +1619,9 @@ app.post("/upload", function (req, res) {
 app.post("/uploadDocument", function (req, res) {
   if (req.files) {
     var file = req.files.fileUrl;
+    var filePath = req.body.filePath;
     var fileType = req.body.fileType || "pdf"; // Default to pdf, pass "image" for scanned images
-    var filePath = String(req.body.filePath || "").replace(/\\/g, "/");
-    var pathToBeCreated = filePath.split("/");
+    var pathToBeCreated = req.body.filePath.split("/");
     pathToBeCreated.pop();
     mkdirp(pathToBeCreated.join("/"), function (err) {
       if (err) console.error(err);
@@ -1655,17 +1642,16 @@ app.post("/uploadDocument", function (req, res) {
                 console.error("convertImageToPdf failed:", error);
                 res.status(500).send("error converting image to pdf");
               } else {
-                const normalizedPath = outputPdfPath.replace(/\\/g, "/");
                 console.log(
                   "Image converted to PDF successfully:",
-                  normalizedPath,
+                  outputPdfPath,
                 );
-                res.send(normalizedPath);
+                res.send(outputPdfPath);
               }
             });
           } else {
             // Already a PDF, no conversion needed
-            res.send(filePath.replace(/\\/g, "/"));
+            res.send(filePath);
           }
         }
       });
@@ -1706,11 +1692,10 @@ const convertImageToPdf = async (filePath, pdfPath, activeKeyRef, cb) => {
     }
 
     await imagesToPdf([filePath], outputPdfPath);
-    const normalizedOutput = outputPdfPath.replace(/\\/g, "/");
     if (cb) {
-      cb(null, normalizedOutput);
+      cb(null, outputPdfPath);
     }
-    return normalizedOutput;
+    return outputPdfPath;
   } catch (error) {
     console.error("Error converting image to PDF:", error);
     if (cb) {

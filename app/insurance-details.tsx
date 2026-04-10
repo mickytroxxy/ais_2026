@@ -5,7 +5,7 @@ import { useAppContext } from "@/contexts/AppContext";
 import { FontAwesome } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -30,7 +30,15 @@ export default function InsuranceDetailsScreen() {
   const handleChange = (field: string, value: string) => {
     setFormData((v) => ({ ...v, [field]: value }));
   };
-
+  useEffect(() => {
+    console.log(carObj?.insurace_type, carObj?.insuranceKey);
+    if (carObj?.insurace_type) {
+      setFormData((v) => ({ ...v, insuranceType: carObj.insurace_type }));
+    }
+    if (carObj?.insuranceKey) {
+      setFormData((v) => ({ ...v, insuranceKey: carObj.insuranceKey }));
+    }
+  }, [carObj]);
   const validateFormData = () => {
     if (formData.insuranceType.length > 0 && formData.insuranceKey.length > 0) {
       setConfirmDialog({
@@ -68,10 +76,7 @@ export default function InsuranceDetailsScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={colors.securityGradient as any}
-        style={styles.gradient}
-      >
+      <LinearGradient colors={["#fff", "#f0f0f0"]} style={styles.gradient}>
         <ScrollView style={{ padding: 10 }}>
           <View style={{ marginTop: 50, padding: 10 }}>
             <Text
@@ -99,6 +104,15 @@ export default function InsuranceDetailsScreen() {
 
           <View style={styles.formContainer}>
             <View style={styles.formInner}>
+              <Text
+                style={{
+                  fontFamily: fontFamilyObj?.fontLight,
+                  fontSize: 16,
+                  color: colors.primary,
+                }}
+              >
+                Insurance Type
+              </Text>
               <AisInput
                 attr={{
                   field: "insuranceType",
@@ -110,15 +124,26 @@ export default function InsuranceDetailsScreen() {
                   },
                   keyboardType: null,
                   placeholder: "Insurance Type",
+                  value: formData.insuranceType || "",
                   color: colors.accent,
                   handleChange,
                 }}
               />
+              <Text
+                style={{
+                  fontFamily: fontFamilyObj?.fontLight,
+                  fontSize: 16,
+                  color: colors.primary,
+                  marginTop: 15,
+                }}
+              >
+                Insurance Key
+              </Text>
               <AisInput
                 attr={{
                   field: "insuranceKey",
                   icon: {
-                    name: "number",
+                    name: "key",
                     type: "Ionicons",
                     min: 3,
                     color: colors.header,
@@ -126,6 +151,7 @@ export default function InsuranceDetailsScreen() {
                   keyboardType: null,
                   placeholder: "Insurance Key",
                   color: colors.accent,
+                  value: formData.insuranceKey || "",
                   handleChange,
                 }}
               />

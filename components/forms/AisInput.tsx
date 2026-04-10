@@ -25,6 +25,7 @@ interface AisInputProps {
     placeholder: string;
     color: string;
     maxLength?: number;
+    value?: string;
     handleChange: (field: string, value: string) => void;
   };
 }
@@ -33,7 +34,9 @@ const AisInput = memo(({ attr }: AisInputProps) => {
   const { fontFamilyObj } = useAppContext();
   const [showPassword, setShowPassword] = useState(true);
   const [value, setValue] = useState("");
-
+  // useEffect(() => {
+  //   setValue(attr.value || "");
+  // }, []);
   const renderIcon = (type: string, name: any, color: string) => {
     const iconProps = { name, size: 24, color };
 
@@ -68,6 +71,7 @@ const AisInput = memo(({ attr }: AisInputProps) => {
             keyboardType={attr.keyboardType || "default"}
             maxLength={attr?.maxLength || 20000}
             placeholderTextColor={"#000"}
+            value={value || attr.value || ""}
             onChangeText={(val) => {
               setValue(val);
               attr.handleChange(attr.field, val);

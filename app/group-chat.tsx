@@ -846,7 +846,7 @@ export default function GroupChatScreen() {
 
     let imageUri = uri;
     if (!uri.startsWith("http")) {
-      imageUri = `http://154.117.189.170:3000/${uri}`;
+      imageUri = `http://154.117.189.170:8080/${uri}`;
     }
 
     return (
@@ -1112,7 +1112,7 @@ export default function GroupChatScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.lightBackground },
   container: { flex: 1, backgroundColor: "#128C7E", borderRadius: 10 },
-  gradient: { flex: 1, borderRadius: 10, overflow: "hidden" },
+  gradient: { flex: 1, borderRadius: 0, overflow: "hidden" },
 
   patternContainer: {
     ...StyleSheet.absoluteFillObject,

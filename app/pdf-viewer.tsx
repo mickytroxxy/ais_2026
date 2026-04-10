@@ -17,7 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Pdf from "react-native-pdf";
+import PdfView from "@/components/PdfView";
 import RNShare from "react-native-share";
 import * as Sharing from "expo-sharing";
 import SignatureScreen, {
@@ -306,7 +306,7 @@ export default function PdfViewerScreen() {
               </View>
             </View>
           ) : isPdfFile ? (
-            <Pdf
+            <PdfView
               source={{ uri: viewUrl, cache: true }}
               style={styles.pdf}
               onLoadComplete={(numberOfPages, filePath) => {

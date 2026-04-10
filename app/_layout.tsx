@@ -54,6 +54,7 @@ function RootLayoutNav() {
         <Stack.Screen name="group-chat" options={{ title: "AIS UPDATE" }} />
         <Stack.Screen name="chatlist" options={{ title: "CHAT LIST" }} />
         <Stack.Screen name="comments" options={{ title: "COMMENTS" }} />
+        <Stack.Screen name="notes" options={{ title: "NOTES" }} />
         <Stack.Screen name="company" options={{ title: "COMPANY PROFILE" }} />
         <Stack.Screen name="document" options={{ title: "DOCUMENT SCANNER" }} />
         <Stack.Screen name="pdf-viewer" options={{ title: "PDF VIEWER" }} />

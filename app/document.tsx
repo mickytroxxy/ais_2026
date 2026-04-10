@@ -14,6 +14,7 @@ import {
   Modal,
   PermissionsAndroid,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -46,7 +47,16 @@ export default function DocumentScreen() {
   const [showNoDocuments, setShowNoDocuments] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [scannedImage, setScannedImage] = useState<string | null>(null);
-
+  const [docDescriptions, setDocDescriptions] = useState<
+    { id: number; description: string }[]
+  >([]);
+  const [selectedDocument, setSelectedDocument] = useState<{
+    id: number;
+    description: string;
+  } | null>(null);
+  const [modalStep, setModalStep] = useState<"description" | "method">(
+    "description",
+  );
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loadingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -95,7 +105,18 @@ export default function DocumentScreen() {
     }
     return normalized;
   };
-
+  const getDocumentDescription = () => {
+    getNetworkStatus((socket, url) => {
+      socket.emit(
+        "get_docs_desc",
+        (response: { id: number; description: string }[]) => {
+          if (response?.length > 0) {
+            setDocDescriptions(response);
+          }
+        },
+      );
+    });
+  };
   const fetchDocuments = () => {
     setLoading(true);
     setShowNoDocuments(false);
@@ -126,6 +147,7 @@ export default function DocumentScreen() {
         }
       });
     });
+    getDocumentDescription();
   };
 
   const scanDocument = async () => {
@@ -162,7 +184,9 @@ export default function DocumentScreen() {
         setScannedImage(scannedUri);
 
         const newDoc = {
-          Description: `Scanned Document ${new Date().toISOString().slice(0, 10)}`,
+          Description:
+            selectedDocument?.description ||
+            `Scanned Document ${new Date().toISOString().slice(0, 10)}`,
           uri: scannedUri,
           type: "image",
         };
@@ -191,7 +215,9 @@ export default function DocumentScreen() {
 
         const newDoc = {
           Description:
-            asset.name || `Document_${new Date().toISOString().slice(0, 10)}`,
+            selectedDocument?.description ||
+            asset.name ||
+            `Document_${new Date().toISOString().slice(0, 10)}`,
           uri: asset.uri,
           type: isPDF ? "pdf" : "image",
         };
@@ -219,12 +245,12 @@ export default function DocumentScreen() {
           setLoading(false);
           return;
         }
-        const parts = filePath?.split("/");
-        const docUrl = parts[parts.length - 1];
+        const docUrl = normalizeDocUrl(filePath)?.split("/")?.pop() || "";
         getNetworkStatus((socket, url) => {
           socket.emit(
             "updateClientDoc",
             docUrl,
+            doc.Description || doc.name || "Document",
             activeKeyRef,
             (success: boolean) => {
               if (success) {
@@ -402,86 +428,206 @@ export default function DocumentScreen() {
         <View style={styles.bottomSheet}>
           <View style={styles.bottomSheetHandle} />
 
-          <Text
-            style={[
-              styles.bottomSheetTitle,
-              { fontFamily: fontFamilyObj?.fontBold },
-            ]}
-          >
-            Add Document
-          </Text>
-
-          <TouchableOpacity
-            style={styles.bottomSheetOption}
-            onPress={() => scanDocument()}
-          >
-            <View
-              style={[
-                styles.bottomSheetIcon,
-                { backgroundColor: colors.primary },
-              ]}
-            >
-              <MaterialIcons
-                name="document-scanner"
-                size={28}
-                color={colors.white}
-              />
-            </View>
-            <View style={styles.bottomSheetOptionText}>
+          {modalStep === "description" ? (
+            <>
               <Text
                 style={[
-                  styles.bottomSheetOptionTitle,
+                  styles.bottomSheetTitle,
                   { fontFamily: fontFamilyObj?.fontBold },
                 ]}
               >
-                Scan Document
+                Select Document Type
               </Text>
-              <Text
-                style={[
-                  styles.bottomSheetOptionSubtitle,
-                  { fontFamily: fontFamilyObj?.fontLight },
-                ]}
-              >
-                Use camera to scan (converts to PDF)
-              </Text>
-            </View>
-          </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.bottomSheetOption}
-            onPress={() => pickDocument()}
-          >
-            <View
-              style={[
-                styles.bottomSheetIcon,
-                { backgroundColor: colors.aiText },
-              ]}
-            >
-              <MaterialIcons
-                name="picture-as-pdf"
-                size={28}
-                color={colors.white}
-              />
-            </View>
-            <View style={styles.bottomSheetOptionText}>
-              <Text
-                style={[
-                  styles.bottomSheetOptionTitle,
-                  { fontFamily: fontFamilyObj?.fontBold },
-                ]}
+              <ScrollView
+                style={{ maxHeight: SCREEN_HEIGHT * 0.5 }}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 20 }}
               >
-                Pick PDF File
-              </Text>
-              <Text
-                style={[
-                  styles.bottomSheetOptionSubtitle,
-                  { fontFamily: fontFamilyObj?.fontLight },
-                ]}
+                {docDescriptions.map((desc) => (
+                  <TouchableOpacity
+                    key={desc.id.toString()}
+                    style={styles.bottomSheetOption}
+                    onPress={() => {
+                      setSelectedDocument(desc);
+                      setModalStep("method");
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.bottomSheetIcon,
+                        { backgroundColor: colors.primary },
+                      ]}
+                    >
+                      <MaterialIcons
+                        name="description"
+                        size={20}
+                        color={colors.white}
+                      />
+                    </View>
+                    <View style={styles.bottomSheetOptionText}>
+                      <Text
+                        style={[
+                          styles.bottomSheetOptionTitle,
+                          { fontFamily: fontFamilyObj?.fontBold },
+                        ]}
+                      >
+                        {desc.description}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+
+                <TouchableOpacity
+                  style={[
+                    styles.bottomSheetOption,
+                    {
+                      backgroundColor: "transparent",
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  onPress={() => {
+                    setSelectedDocument(null);
+                    setModalStep("method");
+                  }}
+                >
+                  <View
+                    style={[styles.bottomSheetOptionText, { marginLeft: 0 }]}
+                  >
+                    <Text
+                      style={[
+                        styles.bottomSheetOptionTitle,
+                        {
+                          fontFamily: fontFamilyObj?.fontBold,
+                          textAlign: "center",
+                        },
+                      ]}
+                    >
+                      Skip Selection
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </ScrollView>
+            </>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 24,
+                  paddingHorizontal: 16,
+                }}
               >
-                Select PDF from files
-              </Text>
-            </View>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    padding: 8,
+                    zIndex: 10,
+                  }}
+                  onPress={() => setModalStep("description")}
+                >
+                  <MaterialIcons
+                    name="arrow-back"
+                    size={24}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.bottomSheetTitle,
+                    {
+                      fontFamily: fontFamilyObj?.fontBold,
+                      marginBottom: 0,
+                      textAlign: "center",
+                      flex: 1,
+                      marginHorizontal: 30,
+                    },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {selectedDocument
+                    ? selectedDocument.description
+                    : "Add Document"}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.bottomSheetOption}
+                onPress={() => scanDocument()}
+              >
+                <View
+                  style={[
+                    styles.bottomSheetIcon,
+                    { backgroundColor: colors.primary },
+                  ]}
+                >
+                  <MaterialIcons
+                    name="document-scanner"
+                    size={28}
+                    color={colors.white}
+                  />
+                </View>
+                <View style={styles.bottomSheetOptionText}>
+                  <Text
+                    style={[
+                      styles.bottomSheetOptionTitle,
+                      { fontFamily: fontFamilyObj?.fontBold },
+                    ]}
+                  >
+                    Scan Document
+                  </Text>
+                  <Text
+                    style={[
+                      styles.bottomSheetOptionSubtitle,
+                      { fontFamily: fontFamilyObj?.fontLight },
+                    ]}
+                  >
+                    Use camera to scan (converts to PDF)
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.bottomSheetOption}
+                onPress={() => pickDocument()}
+              >
+                <View
+                  style={[
+                    styles.bottomSheetIcon,
+                    { backgroundColor: colors.aiText },
+                  ]}
+                >
+                  <MaterialIcons
+                    name="picture-as-pdf"
+                    size={28}
+                    color={colors.white}
+                  />
+                </View>
+                <View style={styles.bottomSheetOptionText}>
+                  <Text
+                    style={[
+                      styles.bottomSheetOptionTitle,
+                      { fontFamily: fontFamilyObj?.fontBold },
+                    ]}
+                  >
+                    Pick PDF File
+                  </Text>
+                  <Text
+                    style={[
+                      styles.bottomSheetOptionSubtitle,
+                      { fontFamily: fontFamilyObj?.fontLight },
+                    ]}
+                  >
+                    Select PDF from files
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </>
+          )}
 
           <TouchableOpacity
             style={styles.bottomSheetCancelButton}
@@ -509,7 +655,11 @@ export default function DocumentScreen() {
           headerRight: () => (
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => setShowBottomSheet(true)}
+              onPress={() => {
+                setModalStep("description");
+                setSelectedDocument(null);
+                setShowBottomSheet(true);
+              }}
             >
               <MaterialIcons name="add" size={24} color={colors.white} />
             </TouchableOpacity>
@@ -664,14 +814,14 @@ const styles = StyleSheet.create({
   bottomSheetOption: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
+    padding: 5,
     backgroundColor: colors.lighterBackground,
     borderRadius: 12,
     marginBottom: 12,
   },
   bottomSheetIcon: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
